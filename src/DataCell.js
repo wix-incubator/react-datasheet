@@ -135,15 +135,10 @@ export default class DataCell extends PureComponent {
     if (keyCode === ESCAPE_KEY) {
       return this.handleRevert();
     }
-    const {
-      cell: { component },
-      forceEdit,
-    } = this.props;
-    const eatKeys = forceEdit || !!component;
     const commit =
       keyCode === ENTER_KEY ||
       keyCode === TAB_KEY ||
-      (!eatKeys && [LEFT_KEY, RIGHT_KEY, UP_KEY, DOWN_KEY].includes(keyCode));
+      [LEFT_KEY, RIGHT_KEY, UP_KEY, DOWN_KEY].includes(keyCode);
 
     if (commit) {
       this.handleCommit(this.state.value, e);
@@ -153,7 +148,10 @@ export default class DataCell extends PureComponent {
   renderComponent(editing, cell) {
     const { component, readOnly, forceComponent } = cell;
     if ((editing && !readOnly) || forceComponent) {
-      return component;
+      return React.cloneElement(component, {
+        onRevert: this.handleRevert,
+        onKeyDown: this.handleKey,
+      });
     }
   }
 
