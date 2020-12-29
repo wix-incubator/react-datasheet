@@ -1,19 +1,18 @@
 {
   "name": "react-datasheet",
   "version": "1.4.8",
-  "description": "Excel-like data grid for React",
+  "description": "Based on github.com/nadbm/react-datasheet. Adjusted for wix-rich-content needs.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nadbm/react-datasheet.git"
+    "url": "https://github.com/wix-incubator/react-datasheet"
   },
-  "author": "Nadim Islam",
+  "author": "",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/nadbm/react-datasheet/issues"
-  },
   "keywords": [
     "react-component",
-    "react"
+    "react",
+    "wix-rich-content",
+    "ricos"
   ],
   "scripts": {
     "lint": "eslint ./src",
@@ -26,7 +25,8 @@
     "test": "NODE_ENV=test nyc --  mocha ./test/**/*.js --require babel-core/register",
     "test:watch": "watch 'npm run test' ./test ./src",
     "format": "prettier --write '{src,test}/**/*.js' --ignore-path docs,.gitignore",
-    "format-test": "prettier-check '**/*.js'"
+    "format-test": "prettier-check '**/*.js'",
+    "release": "node scripts/publish"
   },
   "devDependencies": {
     "@types/react": "^16.0.38",
@@ -79,5 +79,8 @@
     }
   },
   "main": "lib/index.js",
-  "types": "types/react-datasheet.d.ts"
+  "types": "types/react-datasheet.d.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
 }
