@@ -2,7 +2,7 @@ name: release
 on:
   push:
     branches:
-      - 'release*'
+      - 'master'
 jobs:
   publishPackages:
     runs-on: ubuntu-18.04
