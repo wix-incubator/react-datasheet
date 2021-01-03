@@ -148,10 +148,7 @@ export default class DataCell extends PureComponent {
   renderComponent(editing, cell) {
     const { component, readOnly, forceComponent } = cell;
     if ((editing && !readOnly) || forceComponent) {
-      return React.cloneElement(component, {
-        onRevert: this.handleRevert,
-        onKeyDown: this.handleKey,
-      });
+      return component;
     }
   }
 
@@ -228,6 +225,8 @@ export default class DataCell extends PureComponent {
         onDoubleClick={this.handleDoubleClick}
         onContextMenu={this.handleContextMenu}
         onKeyUp={onKeyUp}
+        onRevert={this.handleRevert}
+        onKeyDown={this.handleKey}
       >
         {content}
       </CellRenderer>
