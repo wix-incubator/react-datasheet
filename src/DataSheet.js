@@ -550,10 +550,12 @@ export default class DataSheet extends PureComponent {
       this.state.editing.j !== j
         ? {}
         : this.state.editing;
-
+    const shiftStart = isEmpty(this.state.start)
+      ? this.props.selected.start
+      : this.state.start;
     this._setState({
       selecting: !isNowEditingSameCell,
-      start: e.shiftKey ? this.state.start : { i, j },
+      start: e.shiftKey ? shiftStart : { i, j },
       end: { i, j },
       editing: editing,
       forceEdit: !!isNowEditingSameCell,
