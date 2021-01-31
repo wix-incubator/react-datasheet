@@ -163,107 +163,21 @@ export default class DataSheet extends PureComponent {
   handleCopy(e) {
     if (isEmpty(this.state.editing)) {
       e.preventDefault();
-      const { dataRenderer, valueRenderer, data } = this.props;
       const { start, end } = this.getState();
-
-      if (this.props.handleCopy) {
-        this.props.handleCopy({
-          event: e,
-          dataRenderer,
-          valueRenderer,
-          data,
-          start,
-          end,
-          range,
-        });
-      } else {
-        const text = range(start.i, end.i)
-          .map(i =>
-            range(start.j, end.j)
-              .map(j => {
-                const cell = data[i][j];
-                const value = dataRenderer ? dataRenderer(cell, i, j) : null;
-                if (
-                  value === '' ||
-                  value === null ||
-                  typeof value === 'undefined'
-                ) {
-                  return valueRenderer(cell, i, j);
-                }
-                return value;
-              })
-              .join('\t'),
-          )
-          .join('\n');
-        if (window.clipboardData && window.clipboardData.setData) {
-          window.clipboardData.setData('Text', text);
-        } else {
-          e.clipboardData.setData('text/plain', text);
-        }
-      }
+      this.setState({ copiedCells: { start, end } });
     }
   }
 
   handlePaste(e) {
     if (isEmpty(this.state.editing)) {
-      let { start, end } = this.getState();
-
+      let { start, end, copiedCells } = this.getState();
+      const { onPaste } = this.props;
       start = { i: Math.min(start.i, end.i), j: Math.min(start.j, end.j) };
       end = { i: Math.max(start.i, end.i), j: Math.max(start.j, end.j) };
 
-      const parse = this.props.parsePaste || defaultParsePaste;
-      const changes = [];
-      let pasteData = [];
-      if (window.clipboardData && window.clipboardData.getData) {
-        // IE
-        pasteData = parse(window.clipboardData.getData('Text'));
-      } else if (e.clipboardData && e.clipboardData.getData) {
-        pasteData = parse(e.clipboardData.getData('text/plain'));
+      if (onPaste) {
+        onPaste(copiedCells, start, end);
       }
-
-      // in order of preference
-      const { data, onCellsChanged, onPaste, onChange } = this.props;
-      if (onCellsChanged) {
-        const additions = [];
-        pasteData.forEach((row, i) => {
-          row.forEach((value, j) => {
-            end = { i: start.i + i, j: start.j + j };
-            const cell = data[end.i] && data[end.i][end.j];
-            if (!cell) {
-              additions.push({ row: end.i, col: end.j, value });
-            } else if (!cell.readOnly) {
-              changes.push({ cell, row: end.i, col: end.j, value });
-            }
-          });
-        });
-        if (additions.length) {
-          onCellsChanged(changes, additions);
-        } else {
-          onCellsChanged(changes);
-        }
-      } else if (onPaste) {
-        pasteData.forEach((row, i) => {
-          const rowData = [];
-          row.forEach((pastedData, j) => {
-            end = { i: start.i + i, j: start.j + j };
-            const cell = data[end.i] && data[end.i][end.j];
-            rowData.push({ cell: cell, data: pastedData });
-          });
-          changes.push(rowData);
-        });
-        onPaste(changes);
-      } else if (onChange) {
-        pasteData.forEach((row, i) => {
-          row.forEach((value, j) => {
-            end = { i: start.i + i, j: start.j + j };
-            const cell = data[end.i] && data[end.i][end.j];
-            if (cell && !cell.readOnly) {
-              onChange(cell, end.i, end.j, value);
-            }
-          });
-        });
-      }
-      this._setState({ end });
     }
   }
 
@@ -359,7 +273,7 @@ export default class DataSheet extends PureComponent {
     range(start.i, end.i).map(row => {
       range(start.j, end.j).map(col => {
         if (data[row] && data[row][col]) {
-          selected.push({ cell: data[row][col], row, col });
+          selected.push({ i: row, j: col });
         }
       });
     });
@@ -367,22 +281,10 @@ export default class DataSheet extends PureComponent {
   }
 
   clearSelectedCells(start, end) {
-    const { data, onCellsChanged, onChange } = this.props;
-    const cells = this.getSelectedCells(data, start, end)
-      .filter(cell => !cell.cell.readOnly)
-      .map(cell => ({ ...cell, value: '' }));
-    if (onCellsChanged) {
-      onCellsChanged(cells);
-      this.onRevert();
-    } else if (onChange) {
-      // ugly solution brought to you by https://reactjs.org/docs/react-component.html#setstate
-      // setState in a loop is unreliable
-      setTimeout(() => {
-        cells.forEach(({ cell, row, col, value }) => {
-          onChange(cell, row, col, value);
-        });
-        this.onRevert();
-      }, 0);
+    const { data, onClear } = this.props;
+    const selectedCells = this.getSelectedCells(data, start, end);
+    if (onClear) {
+      onClear(selectedCells);
     }
   }
 
@@ -649,6 +551,9 @@ export default class DataSheet extends PureComponent {
       overflow,
       data,
       keyFn,
+      onClear,
+      getCellContent,
+      setCellContent,
     } = this.props;
     const { forceEdit } = this.state;
     return (
@@ -694,6 +599,9 @@ export default class DataSheet extends PureComponent {
                     dataRenderer={dataRenderer}
                     valueViewer={valueViewer}
                     dataEditor={dataEditor}
+                    onClear={onClear}
+                    getCellContent={getCellContent}
+                    setCellContent={setCellContent}
                     {...(isEditing
                       ? {
                           forceEdit,
@@ -741,6 +649,7 @@ DataSheet.propTypes = {
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
   handleCopy: PropTypes.func,
+  onClear: PropTypes.func,
 };
 
 DataSheet.defaultProps = {
