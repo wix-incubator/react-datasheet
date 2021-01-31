@@ -22,7 +22,6 @@ function widthStyle(cell) {
 export default class DataCell extends PureComponent {
   constructor(props) {
     super(props);
-    this.handleChange = this.handleChange.bind(this);
     this.handleCommit = this.handleCommit.bind(this);
     this.handleRevert = this.handleRevert.bind(this);
 
