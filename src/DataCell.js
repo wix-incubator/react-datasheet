@@ -35,8 +35,8 @@ export default class DataCell extends PureComponent {
   componentDidUpdate(prevProps) {
     if (this.props.editing === true && prevProps.editing === false) {
       const { onClear, row, col, clearing, getCellContent } = this.props;
-      clearing && onClear && onClear([{ i: row, j: col }]);
       this.initialContent = getCellContent && getCellContent(row, col);
+      clearing && onClear && onClear([{ i: row, j: col }]);
     }
   }
 
