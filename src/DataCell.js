@@ -84,7 +84,8 @@ export default class DataCell extends PureComponent {
   handleKey(e) {
     const keyCode = e.which || e.keyCode;
     if (keyCode === ESCAPE_KEY) {
-      this.props.setCellContent(this.initialContent);
+      const { setCellContent, row, col } = this.props;
+      setCellContent && setCellContent(this.initialContent, row, col);
       return this.handleRevert();
     }
     const commit =
