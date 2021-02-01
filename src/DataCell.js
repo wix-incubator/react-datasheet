@@ -34,9 +34,8 @@ export default class DataCell extends PureComponent {
 
   componentDidUpdate(prevProps) {
     if (this.props.editing === true && prevProps.editing === false) {
-      const { onClear, row, col, clearing, getCellContent } = this.props;
+      const { row, col, getCellContent } = this.props;
       this.initialContent = getCellContent && getCellContent(row, col);
-      clearing && onClear && onClear([{ i: row, j: col }]);
     }
   }
 
@@ -162,7 +161,6 @@ DataCell.propTypes = {
   selected: PropTypes.bool,
   editing: PropTypes.bool,
   editValue: PropTypes.any,
-  clearing: PropTypes.bool,
   cellRenderer: PropTypes.func,
   valueRenderer: PropTypes.func.isRequired,
   dataRenderer: PropTypes.func,
@@ -183,6 +181,5 @@ DataCell.defaultProps = {
   forceEdit: false,
   selected: false,
   editing: false,
-  clearing: false,
   cellRenderer: Cell,
 };

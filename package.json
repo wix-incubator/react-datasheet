@@ -1,6 +1,6 @@
 {
   "name": "wix-react-datasheet",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "Based on github.com/nadbm/react-datasheet. Adjusted for wix-rich-content needs.",
   "repository": {
     "type": "git",

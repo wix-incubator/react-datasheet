@@ -28,11 +28,6 @@ const range = (start, end) => {
   }
   return array;
 };
-
-const defaultParsePaste = str => {
-  return str.split(/\r\n|\n|\r/).map(row => row.split('\t'));
-};
-
 export default class DataSheet extends PureComponent {
   constructor(props) {
     super(props);
@@ -51,7 +46,6 @@ export default class DataSheet extends PureComponent {
     this.onRevert = this.onRevert.bind(this);
     this.isSelected = this.isSelected.bind(this);
     this.isEditing = this.isEditing.bind(this);
-    this.isClearing = this.isClearing.bind(this);
     this.handleComponentKey = this.handleComponentKey.bind(this);
 
     this.handleKeyboardCellMovement = this.handleKeyboardCellMovement.bind(
@@ -64,7 +58,6 @@ export default class DataSheet extends PureComponent {
       selecting: false,
       forceEdit: false,
       editing: {},
-      clear: {},
     };
     this.state = this.defaultState;
 
@@ -252,7 +245,7 @@ export default class DataSheet extends PureComponent {
         this.clearSelectedCells(start, end);
       } else if (currentCell && !currentCell.readOnly) {
         if (enterKeyPressed) {
-          this._setState({ editing: start, clear: {}, forceEdit: true });
+          this._setState({ editing: start, forceEdit: true });
           e.preventDefault();
         } else if (
           numbersPressed ||
@@ -262,7 +255,7 @@ export default class DataSheet extends PureComponent {
           equationKeysPressed
         ) {
           // empty out cell if user starts typing without pressing enter
-          this._setState({ editing: start, clear: start, forceEdit: false });
+          this._setState({ editing: start, forceEdit: false });
         }
       }
     }
@@ -437,7 +430,7 @@ export default class DataSheet extends PureComponent {
   onDoubleClick(i, j) {
     let cell = this.props.data[i][j];
     if (!cell.readOnly) {
-      this._setState({ editing: { i: i, j: j }, forceEdit: true, clear: {} });
+      this._setState({ editing: { i: i, j: j }, forceEdit: true });
     }
   }
 
@@ -532,10 +525,6 @@ export default class DataSheet extends PureComponent {
     return this.state.editing.i === i && this.state.editing.j === j;
   }
 
-  isClearing(i, j) {
-    return this.state.clear.i === i && this.state.clear.j === j;
-  }
-
   render() {
     const {
       sheetRenderer: SheetRenderer,
@@ -550,7 +539,6 @@ export default class DataSheet extends PureComponent {
       overflow,
       data,
       keyFn,
-      onClear,
       getCellContent,
       setCellContent,
     } = this.props;
@@ -591,14 +579,12 @@ export default class DataSheet extends PureComponent {
                     onKey={this.handleKey}
                     selected={this.isSelected(i, j)}
                     editing={isEditing}
-                    clearing={this.isClearing(i, j)}
                     attributesRenderer={attributesRenderer}
                     cellRenderer={cellRenderer}
                     valueRenderer={valueRenderer}
                     dataRenderer={dataRenderer}
                     valueViewer={valueViewer}
                     dataEditor={dataEditor}
-                    onClear={onClear}
                     getCellContent={getCellContent}
                     setCellContent={setCellContent}
                     {...(isEditing
