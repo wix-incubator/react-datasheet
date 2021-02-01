@@ -157,7 +157,8 @@ export default class DataSheet extends PureComponent {
     if (isEmpty(this.state.editing)) {
       e.preventDefault();
       const { start, end } = this.getState();
-      this.setState({ copiedCells: { start, end } });
+      const copiedCells = this.getSelectedCells(this.props.data, start, end);
+      this.setState({ copiedCells });
     }
   }
 
@@ -266,7 +267,11 @@ export default class DataSheet extends PureComponent {
     range(start.i, end.i).map(row => {
       range(start.j, end.j).map(col => {
         if (data[row] && data[row][col]) {
-          selected.push({ i: row, j: col });
+          selected.push({
+            i: row,
+            j: col,
+            content: this.props.getCellContent(row, col),
+          });
         }
       });
     });
