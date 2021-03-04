@@ -187,13 +187,14 @@ export default class DataSheet extends PureComponent {
     const hasComponent = currentCell && currentCell.component;
 
     const keyCode = e.which || e.keyCode;
+    const isTab = keyCode === TAB_KEY;
 
-    if (hasComponent && isEditing) {
+    if (!isTab && hasComponent && isEditing) {
       e.preventDefault();
       return;
     }
 
-    if (keyCode === TAB_KEY) {
+    if (isTab) {
       this.handleNavigate(e, { i: 0, j: e.shiftKey ? -1 : 1 }, true);
     } else if (keyCode === RIGHT_KEY) {
       this.handleNavigate(e, { i: 0, j: 1 });
